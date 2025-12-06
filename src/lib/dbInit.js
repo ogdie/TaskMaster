@@ -44,25 +44,19 @@ export async function initializeDatabase() {
 export async function checkDatabaseHealth() {
   try {
     const db = await connectToDB();
-    const adminDb = db.admin();
-    
-    const serverStatus = await adminDb.serverStatus();
-    const mongoStats = await db.connection.db.stats();
+
+    // Teste simples: listar collections
+    const collections = await db.connection.db.listCollections().toArray();
+    const stats = await db.connection.db.stats();
 
     return {
       status: "healthy",
       timestamp: new Date().toISOString(),
-      mongodb: {
-        uptime: serverStatus.uptime,
-        opcounters: serverStatus.opcounters,
-        connections: serverStatus.connections.current,
-        memoryUsage: serverStatus.mem
-      },
       database: {
-        name: mongoStats.db,
-        collections: mongoStats.collections,
-        sizeOnDisk: mongoStats.dataSize,
-        indexes: mongoStats.indexes
+        name: stats.db,
+        collections: collections.length,
+        sizeOnDisk: stats.dataSize,
+        indexes: stats.indexes
       }
     };
   } catch (error) {
