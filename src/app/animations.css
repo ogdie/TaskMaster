@@ -1,0 +1,269 @@
+/* ====================================
+   ANIMAÇÕES DO TASKMASTER
+   ==================================== */
+
+/* ====== MODAL ANIMATIONS ====== */
+
+/* Animação de entrada do modal */
+@keyframes modalIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Animação de saída do modal */
+@keyframes modalOut {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+  }
+}
+
+/* Animação do backdrop (fundo escurecido) */
+@keyframes backdropIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Classe para modal visível */
+.modal-enter {
+  animation: backdropIn 0.3s ease-out;
+}
+
+.modal-content-enter {
+  animation: modalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ====== CARD ANIMATIONS ====== */
+
+/* Hover effect nos cards */
+@keyframes cardHover {
+  0% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 4px 6px rgba(0, 255, 0, 0.1);
+  }
+  100% {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 12px 20px rgba(0, 255, 0, 0.25);
+  }
+}
+
+/* Animação de entrada dos cards */
+@keyframes cardSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card-hover:hover {
+  animation: cardHover 0.3s ease-out forwards;
+}
+
+.card-enter {
+  animation: cardSlideIn 0.5s ease-out;
+}
+
+/* ====== BUTTON ANIMATIONS ====== */
+
+/* Animação de botões ao hover */
+@keyframes buttonPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes buttonGlow {
+  0% {
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+  }
+}
+
+.btn-primary {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.btn-primary:hover {
+  animation: buttonPulse 0.3s ease-out;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+/* ====== LOADING ANIMATIONS ====== */
+
+/* Spinner de carregamento */
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pulse de carregamento */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading-spinner {
+  animation: spinner 1s linear infinite;
+}
+
+.loading-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ====== FORM ANIMATIONS ====== */
+
+/* Animação de input ao focar */
+@keyframes inputFocus {
+  0% {
+    box-shadow: 0 0 0 0px rgba(0, 255, 0, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 4px rgba(0, 255, 0, 0.1);
+  }
+}
+
+.form-input {
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  animation: inputFocus 0.3s ease-out;
+}
+
+/* Animação de erro em campo */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+.input-error {
+  animation: shake 0.3s ease-in-out;
+}
+
+/* ====== TEXT ANIMATIONS ====== */
+
+/* Fade in de texto */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Slide in de texto */
+@keyframes slideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.text-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.text-slide-in {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+/* ====== TRANSITION HELPERS ====== */
+
+/* Transição suave geral */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Transição rápida */
+.transition-fast {
+  transition: all 0.15s ease-out;
+}
+
+/* Transição lenta */
+.transition-slow {
+  transition: all 0.5s ease-out;
+}
+
+/* ====== RESPONSIVE ADJUSTMENTS ====== */
+
+@media (max-width: 640px) {
+  /* Animações um pouco mais rápidas em mobile */
+  .modal-content-enter {
+    animation-duration: 0.3s;
+  }
+
+  .card-enter {
+    animation-duration: 0.3s;
+  }
+
+  /* Reduz glow effect em mobile para economizar bateria */
+  @keyframes buttonGlowMobile {
+    0%, 100% {
+      box-shadow: 0 0 3px rgba(0, 255, 0, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
+    }
+  }
+
+  .btn-primary:hover {
+    animation: buttonGlowMobile 0.3s ease-out;
+  }
+}
