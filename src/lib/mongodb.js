@@ -1,11 +1,5 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  throw new Error("Por favor defina a variável de ambiente MONGODB_URI no .env");
-}
-
 let cached = global.mongoose;
 
 if (!cached) {
@@ -13,6 +7,13 @@ if (!cached) {
 }
 
 async function connectToDB() {
+  // Lazy check da variável de ambiente - só verifica quando a função é chamada
+  const MONGODB_URI = process.env.MONGODB_URI;
+
+  if (!MONGODB_URI) {
+    throw new Error("Por favor defina a variável de ambiente MONGODB_URI no .env");
+  }
+
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {

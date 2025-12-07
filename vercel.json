@@ -3,17 +3,6 @@
   "installCommand": "npm install --legacy-peer-deps",
   "framework": "nextjs",
 
-  "env": {
-    "NEXT_PUBLIC_API_URL": "",
-    "MONGODB_URI": "",
-    "NEXTAUTH_SECRET": "",
-    "NEXTAUTH_URL": "",
-    "GITHUB_ID": "",
-    "GITHUB_SECRET": "",
-    "GOOGLE_ID": "",
-    "GOOGLE_SECRET": ""
-  },
-
   "headers": [
     {
       "source": "/api/health",

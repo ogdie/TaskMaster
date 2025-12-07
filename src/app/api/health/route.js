@@ -11,6 +11,21 @@ import { checkDatabaseHealth, initializeDatabase } from "@/lib/dbInit";
 
 export async function GET() {
   try {
+    // Verificar se MONGODB_URI está definido antes de tentar conectar
+    if (!process.env.MONGODB_URI) {
+      return new Response(
+        JSON.stringify({
+          status: "error",
+          error: "MONGODB_URI não está definida nas variáveis de ambiente",
+          timestamp: new Date().toISOString()
+        }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" }
+        }
+      );
+    }
+
     // Na primeira requisição, inicializar índices
     await initializeDatabase();
 
@@ -27,7 +42,8 @@ export async function GET() {
       JSON.stringify({
         status: "error",
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        hint: "Verifique se todas as variáveis de ambiente estão configuradas no painel da Vercel"
       }),
       {
         status: 500,

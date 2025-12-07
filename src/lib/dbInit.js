@@ -43,6 +43,15 @@ export async function initializeDatabase() {
  */
 export async function checkDatabaseHealth() {
   try {
+    // Verificar se MONGODB_URI está definido
+    if (!process.env.MONGODB_URI) {
+      return {
+        status: "unhealthy",
+        error: "MONGODB_URI não está definida nas variáveis de ambiente",
+        timestamp: new Date().toISOString()
+      };
+    }
+
     const db = await connectToDB();
 
     // Teste simples: listar collections
