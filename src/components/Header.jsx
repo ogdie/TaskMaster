@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useSession, signOut } from "next-auth/react";
-import { openSignUpModal } from "@/features/ui/uiSlice";
+import { useSession } from "next-auth/react";
+import { Box, Heading, Container, Flex } from "@chakra-ui/react";
 import dynamic from "next/dynamic";
 
 const HeaderContent = dynamic(() => import("@/components/HeaderContent"), {
   ssr: false,
-  loading: () => <div className="h-6" />
+  loading: () => <Box h="24px" />
 });
 
 export default function Header() {
@@ -21,13 +21,29 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="bg-linear-to-r from-black via-gray-900 to-black shadow border-b border-green-400 sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
-        <div className="flex justify-between items-center">
-          <h1 className="text-xl sm:text-2xl font-bold text-green-400">TaskMaster</h1>
+    <Box
+      as="header"
+      bgGradient="linear(to-r, black, gray.900, black)"
+      borderBottomWidth="1px"
+      borderBottomColor="brand.600"
+      position="sticky"
+      top={0}
+      zIndex={40}
+      shadow="md"
+    >
+      <Container maxW="7xl" py={3} px={{ base: 3, sm: 6, lg: 8 }}>
+        <Flex justify="space-between" align="center">
+          <Heading
+            as="h1"
+            size={{ base: "md", sm: "lg" }}
+            color="brand.400"
+            fontWeight="bold"
+          >
+            TaskMaster
+          </Heading>
           {mounted && <HeaderContent session={session} dispatch={dispatch} />}
-        </div>
-      </div>
-    </header>
+        </Flex>
+      </Container>
+    </Box>
   );
 }

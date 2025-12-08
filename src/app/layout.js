@@ -22,7 +22,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="pt-br" suppressHydrationWarning>
       <head>
-        {/* Sentry initialization script */}
         {process.env.NEXT_PUBLIC_SENTRY_DSN && (
           <script
             src="https://browser.sentry-cdn.com/7.95.0/bundle.min.js"

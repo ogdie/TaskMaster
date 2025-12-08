@@ -5,6 +5,27 @@ import { MdEdit, MdDelete, MdAdd } from "react-icons/md";
 import { useGetTasksQuery, useDeleteTaskMutation } from "@/features/tasks/tasksApi";
 import { useSession } from "next-auth/react";
 import { openTaskForm } from "@/features/ui/uiSlice";
+import {
+  Box,
+  VStack,
+  Button,
+  Text,
+  HStack,
+  Heading,
+  Icon,
+  Spinner,
+  Alert,
+  AlertIcon,
+  useDisclosure,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  useToast,
+} from "@chakra-ui/react";
+import { useRef, useState } from "react";
 
 export default function TaskList() {
   const { data: session } = useSession();
@@ -12,63 +33,185 @@ export default function TaskList() {
   const [deleteTask] = useDeleteTaskMutation();
   const dispatch = useDispatch();
   const showTaskForm = useSelector((state) => state.ui.showTaskForm);
+  const [taskToDelete, setTaskToDelete] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef();
+  const toast = useToast();
 
-  if (!session) return <p className="text-gray-400">Faça login para ver suas tarefas.</p>;
-  if (isLoading) return <p className="text-green-400">Carregando tarefas...</p>;
+  const handleDeleteClick = (task) => {
+    setTaskToDelete(task);
+    onOpen();
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (taskToDelete) {
+      try {
+        await deleteTask(taskToDelete._id).unwrap();
+        toast({
+          title: "Tarefa deletada",
+          description: `A tarefa "${taskToDelete.title}" foi deletada.`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      } catch (err) {
+        toast({
+          title: "Erro ao deletar tarefa",
+          description: "Ocorreu um erro ao deletar a tarefa. Tente novamente.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+      setTaskToDelete(null);
+      onClose();
+    }
+  };
+
+  if (!session) {
+    return (
+      <Alert status="info" borderRadius="md">
+        <AlertIcon />
+        Faça login para ver suas tarefas.
+      </Alert>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" py={8}>
+        <Spinner size="xl" color="brand.400" thickness="4px" />
+      </Box>
+    );
+  }
 
   const taskList = Array.isArray(tasks) ? tasks : [];
 
   return (
-    <div className="space-y-4">
-      <div className="flex gap-2">
-        <button
+    <VStack spacing={4} align="stretch">
+      <Box>
+        <Button
           onClick={() => dispatch(openTaskForm(null))}
           aria-label="Criar nova tarefa"
-          className="bg-green-500 text-white px-4 py-2 rounded w-full sm:w-auto flex items-center justify-center gap-2"
+          colorScheme="green"
+          leftIcon={<Icon as={MdAdd} />}
+          w={{ base: "full", sm: "auto" }}
         >
-          <MdAdd className="w-5 h-5" aria-hidden="true" />
-          <span>Criar Nova Tarefa</span>
-        </button>
-      </div>
+          Criar Nova Tarefa
+        </Button>
+      </Box>
 
       {showTaskForm && <TaskForm />}
 
       {taskList.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-gray-400">Nenhuma tarefa encontrada</p>
-        </div>
+        <Box textAlign="center" py={8}>
+          <Text color="gray.400" fontSize="lg">
+            Nenhuma tarefa encontrada
+          </Text>
+        </Box>
       ) : (
-        <div className="space-y-2">
+        <VStack spacing={2} align="stretch">
           {taskList.map((task) => (
-            <div key={task._id} className="p-3 border rounded bg-gray-800">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className={`font-bold ${task.completed ? "line-through text-gray-500" : "text-green-400"}`}>{task.title}</h3>
-                  <p className="text-gray-300 text-sm">{task.description}</p>
-                </div>
-                <div className="flex gap-2">
-                  <button
+            <Box
+              key={task._id}
+              bg="gray.800"
+              borderWidth="1px"
+              borderColor="gray.700"
+              borderRadius="md"
+              p={4}
+            >
+              <HStack justify="space-between" align="start" spacing={4}>
+                <Box flex={1}>
+                  <Heading
+                    as="h3"
+                    size="md"
+                    textDecoration={task.completed ? "line-through" : "none"}
+                    color={task.completed ? "gray.500" : "brand.400"}
+                    mb={task.description ? 2 : 0}
+                  >
+                    {task.title}
+                  </Heading>
+                  {task.description && (
+                    <Text color="gray.300" fontSize="sm">
+                      {task.description}
+                    </Text>
+                  )}
+                </Box>
+                <HStack spacing={2}>
+                  <Button
                     onClick={() => dispatch(openTaskForm(task))}
                     aria-label={`Editar ${task.title}`}
-                    className="bg-blue-600 text-white px-2 py-1 rounded flex items-center gap-2"
+                    colorScheme="blue"
+                    size="sm"
+                    leftIcon={<Icon as={MdEdit} />}
+                    display={{ base: "none", sm: "flex" }}
                   >
-                    <MdEdit className="w-4 h-4" aria-hidden="true" />
-                    <span className="hidden sm:inline">Editar</span>
-                  </button>
-                  <button
-                    onClick={() => { if (confirm(`Deletar \"${task.title}\"?`)) deleteTask(task._id); }}
+                    Editar
+                  </Button>
+                  <Button
+                    onClick={() => dispatch(openTaskForm(task))}
+                    aria-label={`Editar ${task.title}`}
+                    colorScheme="blue"
+                    size="sm"
+                    iconSpacing={0}
+                    display={{ base: "flex", sm: "none" }}
+                  >
+                    <Icon as={MdEdit} />
+                  </Button>
+                  <Button
+                    onClick={() => handleDeleteClick(task)}
                     aria-label={`Deletar ${task.title}`}
-                    className="bg-red-600 text-white px-2 py-1 rounded flex items-center gap-2"
+                    colorScheme="red"
+                    size="sm"
+                    leftIcon={<Icon as={MdDelete} />}
+                    display={{ base: "none", sm: "flex" }}
                   >
-                    <MdDelete className="w-4 h-4" aria-hidden="true" />
-                    <span className="hidden sm:inline">Deletar</span>
-                  </button>
-                </div>
-              </div>
-            </div>
+                    Deletar
+                  </Button>
+                  <Button
+                    onClick={() => handleDeleteClick(task)}
+                    aria-label={`Deletar ${task.title}`}
+                    colorScheme="red"
+                    size="sm"
+                    iconSpacing={0}
+                    display={{ base: "flex", sm: "none" }}
+                  >
+                    <Icon as={MdDelete} />
+                  </Button>
+                </HStack>
+              </HStack>
+            </Box>
           ))}
-        </div>
+        </VStack>
       )}
-    </div>
+
+      <AlertDialog
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+        motionPreset="slideInBottom"
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Deletar Tarefa
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Tem certeza que deseja deletar a tarefa "{taskToDelete?.title}"? Esta ação não pode ser desfeita.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose}>
+                Cancelar
+              </Button>
+              <Button colorScheme="red" onClick={handleDeleteConfirm} ml={3}>
+                Deletar
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+    </VStack>
   );
 }

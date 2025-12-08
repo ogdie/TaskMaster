@@ -5,11 +5,30 @@ import { useDispatch, useSelector } from "react-redux";
 import { useAddTaskMutation, useUpdateTaskMutation } from "@/features/tasks/tasksApi";
 import { closeTaskForm } from "@/features/ui/uiSlice";
 import { MdCheck, MdAdd } from "react-icons/md";
-import { FiX } from "react-icons/fi";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  FormControl,
+  FormLabel,
+  Input,
+  Textarea,
+  Checkbox,
+  Button,
+  VStack,
+  HStack,
+  Icon,
+  useToast,
+} from "@chakra-ui/react";
 
 export default function TaskForm() {
   const dispatch = useDispatch();
   const editingTask = useSelector((state) => state.ui.editingTask);
+  const showTaskForm = useSelector((state) => state.ui.showTaskForm);
+  const toast = useToast();
 
   const { register, handleSubmit, reset } = useForm({
     defaultValues: editingTask || { title: "", description: "", completed: false },
@@ -18,13 +37,13 @@ export default function TaskForm() {
   // Suporte a teclado: Escape para fechar modal
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" && showTaskForm) {
         dispatch(closeTaskForm());
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [dispatch]);
+  }, [dispatch, showTaskForm]);
 
   const [addTask] = useAddTaskMutation();
   const [updateTask] = useUpdateTaskMutation();
@@ -33,83 +52,111 @@ export default function TaskForm() {
     try {
       if (editingTask) {
         await updateTask({ ...editingTask, ...data }).unwrap();
+        toast({
+          title: "Tarefa atualizada",
+          description: "A tarefa foi atualizada com sucesso.",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
       } else {
         await addTask(data).unwrap();
+        toast({
+          title: "Tarefa criada",
+          description: "A tarefa foi criada com sucesso.",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
       }
       reset();
       dispatch(closeTaskForm());
     } catch (err) {
       console.error("Erro ao salvar tarefa:", err);
-      alert("Erro ao salvar tarefa. Verifique o console.");
+      toast({
+        title: "Erro ao salvar tarefa",
+        description: "Ocorreu um erro ao salvar a tarefa. Tente novamente.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center sm:items-center justify-center z-50 p-3 sm:p-4 modal-enter" role="dialog" aria-modal="true" aria-labelledby="taskform-title">
-      <div className="bg-linear-to-br from-gray-900 to-gray-800 rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6 relative border-2 border-green-400 modal-content-enter">
-        <button
-          onClick={() => dispatch(closeTaskForm())}
-          aria-label="Fechar modal de tarefa"
-          className="absolute top-2 sm:top-4 right-2 sm:right-4 text-green-400 hover:text-green-300 text-2xl font-bold w-8 h-8 flex items-center justify-center transition-fast"
-        >
-          <FiX className="w-5 h-5" aria-hidden="true" />
-        </button>
+    <Modal
+      isOpen={showTaskForm}
+      onClose={() => dispatch(closeTaskForm())}
+      size="md"
+      isCentered
+      motionPreset="slideInBottom"
+    >
+      <ModalOverlay />
+      <ModalContent>
+        <ModalHeader id="taskform-title" color="brand.400">
+          {editingTask ? "Editar Tarefa" : "Criar Tarefa"}
+        </ModalHeader>
+        <ModalCloseButton color="brand.400" _hover={{ color: "brand.300" }} />
 
-        <h2 id="taskform-title" className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 pr-6 text-green-400">{editingTask ? "Editar Tarefa" : "Criar Tarefa"}</h2>
+        <ModalBody pb={6}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <VStack spacing={4}>
+              <FormControl isRequired>
+                <FormLabel color="brand.400">Título</FormLabel>
+                <Input
+                  id="task-title"
+                  type="text"
+                  placeholder="Título da tarefa"
+                  {...register("title", { required: true })}
+                  aria-label="Título da tarefa"
+                />
+              </FormControl>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-2 sm:space-y-4">
-          <div>
-            <label htmlFor="task-title" className="block text-sm font-medium text-green-400 mb-2">Título</label>
-            <input
-              id="task-title"
-              type="text"
-              placeholder="Título da tarefa"
-              {...register("title", { required: true })}
-              aria-label="Título da tarefa"
-              aria-required="true"
-              className="w-full border-2 border-green-400 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-300 form-input"
-              style={{ backgroundColor: '#ffffff', color: '#111827', borderColor: '#16a34a' }}
-              required
-            />
-          </div>
+              <FormControl>
+                <FormLabel color="brand.400">Descrição</FormLabel>
+                <Textarea
+                  id="task-description"
+                  placeholder="Descreva a tarefa..."
+                  {...register("description")}
+                  rows={4}
+                />
+              </FormControl>
 
-          <div>
-            <label htmlFor="task-description" className="block text-sm font-medium text-green-400 mb-2">Descrição</label>
-            <textarea
-              id="task-description"
-              placeholder="Descreva a tarefa..."
-              {...register("description")}
-              rows={4}
-              className="w-full border-2 border-green-400 rounded-lg px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-300 form-input"
-              style={{ backgroundColor: '#ffffff', color: '#111827', borderColor: '#16a34a' }}
-            />
-          </div>
+              <FormControl>
+                <Checkbox
+                  {...register("completed")}
+                  id="task-completed"
+                  colorScheme="green"
+                  size="lg"
+                >
+                  Concluída
+                </Checkbox>
+              </FormControl>
 
-          <div className="flex items-center gap-2">
-            <input type="checkbox" {...register("completed")} id="task-completed" />
-            <label htmlFor="task-completed" className="text-sm">Concluída</label>
-          </div>
-
-          <div className="flex gap-2 sm:gap-3 pt-2 flex-col sm:flex-row">
-            <button
-              type="submit"
-              aria-label={editingTask ? "Atualizar tarefa" : "Criar nova tarefa"}
-              className="flex-1 bg-green-500 text-white px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg hover:bg-green-600 transition font-medium border-2 border-green-400 btn-primary flex items-center justify-center gap-2"
-            >
-              {editingTask ? <MdCheck className="w-5 h-5" aria-hidden="true" /> : <MdAdd className="w-5 h-5" aria-hidden="true" />}
-              <span>{editingTask ? "Atualizar" : "Criar"}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => dispatch(closeTaskForm())}
-              aria-label="Cancelar"
-              className="flex-1 bg-gray-700 text-gray-200 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg hover:bg-gray-600 transition font-medium border-2 border-gray-500 btn-primary"
-            >
-              Cancelar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+              <HStack w="full" spacing={3} pt={2} flexDirection={{ base: "column", sm: "row" }}>
+                <Button
+                  type="submit"
+                  aria-label={editingTask ? "Atualizar tarefa" : "Criar nova tarefa"}
+                  colorScheme="green"
+                  flex={1}
+                  leftIcon={<Icon as={editingTask ? MdCheck : MdAdd} />}
+                >
+                  {editingTask ? "Atualizar" : "Criar"}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => dispatch(closeTaskForm())}
+                  aria-label="Cancelar"
+                  colorScheme="gray"
+                  flex={1}
+                >
+                  Cancelar
+                </Button>
+              </HStack>
+            </VStack>
+          </form>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }

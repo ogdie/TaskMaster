@@ -2,35 +2,42 @@
 import { useDispatch } from "react-redux";
 import { signOut } from "next-auth/react";
 import { openSignUpModal } from "@/features/ui/uiSlice";
+import { Flex, Text, Button, Icon } from "@chakra-ui/react";
 import { MdLogout, MdPersonAdd } from "react-icons/md";
 
 export default function HeaderContent({ session, dispatch }) {
   return (
-    <div className="flex items-center gap-3">
+    <Flex align="center" gap={3}>
       {session ? (
         <>
-          <span className="text-sm text-gray-300 hidden sm:inline">
+          <Text
+            fontSize="sm"
+            color="gray.300"
+            display={{ base: "none", sm: "inline" }}
+          >
             Olá, {session.user.name || session.user.email}
-          </span>
-          <button
+          </Text>
+          <Button
             onClick={() => signOut({ callbackUrl: "/" })}
             aria-label="Fazer logout"
-            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded flex items-center gap-2 transition"
+            colorScheme="red"
+            size="sm"
+            leftIcon={<Icon as={MdLogout} />}
           >
-            <MdLogout className="w-4 h-4" aria-hidden="true" />
-            <span>Logout</span>
-          </button>
+            Logout
+          </Button>
         </>
       ) : (
-        <button
+        <Button
           onClick={() => dispatch(openSignUpModal())}
           aria-label="Abrir cadastro"
-          className="text-green-400 hover:text-green-300 flex items-center gap-2 transition"
+          variant="ghost"
+          colorScheme="green"
+          leftIcon={<Icon as={MdPersonAdd} />}
         >
-          <MdPersonAdd className="w-4 h-4" aria-hidden="true" />
-          <span>Cadastrar</span>
-        </button>
+          Cadastrar
+        </Button>
       )}
-    </div>
+    </Flex>
   );
 }

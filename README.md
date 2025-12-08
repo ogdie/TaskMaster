@@ -2,14 +2,15 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## 🎯 Sobre o Projeto
 
-**TaskMaster** é um aplicativo web moderno de gerenciamento de tarefas, desenvolvido com Next.js, React, Redux e NextAuth.js. O aplicativo oferece autenticação de usuários via credenciais, GitHub e Google, com interface responsiva otimizada para smartphones.
+**TaskMaster** é um aplicativo web moderno de gerenciamento de tarefas, desenvolvido com Next.js, React, Redux, NextAuth.js e Chakra UI. O aplicativo oferece autenticação de usuários via credenciais, GitHub e Google, com interface responsiva otimizada para smartphones usando um Design System profissional.
 
 ### ✨ Principais Características
 
 - 🔐 Autenticação com NextAuth.js (Credenciais, GitHub, Google)
 - ✅ CRUD completo de tarefas
-- 🎨 Interface moderna com tema neon preto e verde fluorescente
+- 🎨 Interface moderna com **Chakra UI** e tema neon preto e verde fluorescente
 - 📱 Design totalmente responsivo para mobile
+- 🧩 Design System profissional com componentes acessíveis
 - 🌐 Redux para gerenciamento de estado global
 - 💾 Integração com MongoDB
 - 🔄 Atualizações em tempo real com RTK Query
@@ -62,14 +63,22 @@ projeto01/
 │   │       │   └── [...nextauth]/ # Dinâmica NextAuth
 │   │       └── tasks/            # Rota de tarefas
 │   ├── components/
-│   │   ├── Header.jsx            # Cabeçalho com tema neon
-│   │   ├── LoginForm.jsx         # Formulário de login
-│   │   ├── SignUpModal.jsx       # Modal de cadastro
-│   │   ├── TaskForm.jsx          # Formulário de tarefa
-│   │   ├── TaskList.jsx          # Lista de tarefas
-│   │   ├── Providers.jsx         # SessionProvider e ReduxProvider
+│   │   ├── Header.jsx            # Cabeçalho com Chakra UI
+│   │   ├── HeaderContent.jsx     # Conteúdo interno do header
+│   │   ├── LoginForm.jsx         # Formulário de login (Chakra UI)
+│   │   ├── SignUpModal.jsx       # Modal de cadastro (Chakra UI)
+│   │   ├── TaskForm.jsx          # Formulário de tarefa (Chakra UI)
+│   │   ├── TaskList.jsx          # Lista de tarefas (Chakra UI)
+│   │   ├── Providers.jsx         # ChakraProvider, SessionProvider e ReduxProvider
 │   │   ├── ReduxProvider.jsx     # Provedor Redux
 │   │   └── WebVitalsTracker.jsx  # Rastreamento de Web Vitals
+│   ├── lib/
+│   │   ├── theme.js              # Tema customizado do Chakra UI
+│   │   ├── mongodb.js           # Conexão MongoDB
+│   │   ├── dbInit.js            # Inicialização do banco
+│   │   ├── dbOptimization.js    # Otimizações de queries
+│   │   ├── sentry.config.js     # Configuração Sentry
+│   │   └── sentry-examples.js   # Exemplos de uso Sentry
 │   ├── features/
 │   │   ├── auth/
 │   │   │   └── authSlice.js     # Slice de autenticação
@@ -101,29 +110,49 @@ projeto01/
 
 ## 🎨 Design & Responsividade
 
-### Tema Visual
-- **Paleta de Cores**: Preto + Verde Fluorescente (#00ff00)
-- **Gradiente de Fundo**: Linear gradient (135deg) preto → verde → preto
-- **Bordas Destacadas**: Verde fluorescente (2px) em modais e cards
-- **Texto em Destaque**: Verde fluorescente para títulos e labels
+### Design System - Chakra UI
+O projeto utiliza **Chakra UI v2.10.9** como Design System, oferecendo:
+- ✅ Componentes acessíveis e semânticos
+- ✅ Sistema de temas customizável
+- ✅ Responsividade built-in
+- ✅ Animações e transições suaves
+- ✅ Suporte completo a dark mode
+
+### Tema Visual Customizado
+- **Paleta de Cores**: Preto + Verde Neon (brand.600: #16a34a)
+- **Gradiente de Fundo**: Linear gradient (135deg) preto → gray.900 → preto
+- **Bordas Destacadas**: Verde neon (2px) em modais e cards
+- **Texto em Destaque**: Verde neon (brand.400) para títulos e labels
+- **Modo Escuro**: Ativado por padrão
+
+### Componentes Principais
+- **Modal/Dialog**: Modais acessíveis com overlay e animações
+- **Form Controls**: Inputs, Textareas e Checkboxes com validação visual
+- **Buttons**: Variantes (solid, outline, ghost) com estados hover/active
+- **Cards/Box**: Containers estilizados com bordas e backgrounds
+- **Alerts**: Feedback visual para erros e sucessos
+- **Toast Notifications**: Notificações não intrusivas
 
 ### Breakpoints Responsivos
-- **Mobile**: < 640px
-- **Tablet/Desktop**: ≥ 640px
+- **Mobile**: < 640px (base)
+- **Tablet**: ≥ 640px (sm)
+- **Desktop**: ≥ 1024px (lg)
 
-Classes responsivas utilizadas:
-- `sm:` para breakpoint tablet
-- Padding e margin ajustados para cada tamanho
-- Fontes responsivas (text-xs/sm/base)
-- Layouts flexíveis (flex-col/sm:flex-row)
+Chakra UI utiliza props responsivas:
+- `base`, `sm`, `md`, `lg` para valores responsivos
+- Layouts flexíveis com `HStack`, `VStack`, `Flex`
+- Componentes adaptáveis automaticamente
 
 ## 🔧 Tecnologias Utilizadas
 
 | Tecnologia | Versão | Descrição |
 |-----------|--------|-----------|
-| **Next.js** | 16.0.6 | Framework React com SSR |
+| **Next.js** | 16.0.7 | Framework React com SSR |
 | **React** | 19.2.0 | Biblioteca UI |
-| **Tailwind CSS** | 4 | Utility-first CSS |
+| **Chakra UI** | 2.10.9 | Design System e componentes |
+| **Emotion** | 11.14.0 | CSS-in-JS (usado pelo Chakra) |
+| **Framer Motion** | 12.23.25 | Animações (usado pelo Chakra) |
+| **Tailwind CSS** | 4 | Utility-first CSS (legado) |
 | **Redux Toolkit** | 2.11.0 | Gerenciamento de estado |
 | **RTK Query** | - | Data fetching |
 | **NextAuth.js** | 4.24.13 | Autenticação |
@@ -176,13 +205,16 @@ PWA_ENABLED=true
 
 ## 📱 Funcionalidades Mobile
 
-✅ Header responsivo com menu adaptado
-✅ Formulários com campos visíveis e placeholders
-✅ Modais otimizados para telas pequenas
-✅ Inputs com bordas destacadas
-✅ Botões com tamanho adequado para touch
+✅ Header responsivo com menu adaptado (Chakra UI)
+✅ Formulários acessíveis com validação visual
+✅ Modais otimizados e acessíveis para telas pequenas
+✅ Inputs com estados de foco e hover destacados
+✅ Botões com tamanho adequado para touch (48px mínimo)
+✅ Toast notifications para feedback não intrusivo
+✅ Alert dialogs para confirmações importantes
 ✅ Scroll suave implementado
 ✅ Sem scroll horizontal (overflow-x: hidden)
+✅ Suporte completo a navegação por teclado
 
 ## 📱 Progressive Web App (PWA)
 
