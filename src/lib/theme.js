@@ -110,7 +110,7 @@ const theme = extendTheme({
           bg: 'blackAlpha.700',
         },
         dialog: {
-          bg: 'linear(to-br, gray.900, gray.800)',
+          bgGradient: 'linear(to-br, gray.900, gray.800)',
           borderWidth: '2px',
           borderColor: 'brand.600',
           borderRadius: 'lg',
